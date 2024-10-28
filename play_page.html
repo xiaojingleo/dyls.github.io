@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>播放页面</title>
+    <link rel="stylesheet" href="./css/play_page.css">
+    <script src="./js/hls.min.js"></script>
+    <script src="https://cdn.staticfile.org/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/2.3.1/jsencrypt.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.0.0-beta.1/jsencrypt.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+    <script src="./js/common.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <!-- 视频播放器 -->
+    <div class="video-container">
+        <video id="videoPlayer" controls></video>
+        <div class="controls" id="controls">
+            <button id="playPause">暂停</button>
+            <input type="range" id="progressBar" value="0" min="0" max="100">
+            <span id="currentTime">0:00</span> / <span id="duration">0:00</span>
+            <button id="fullscreen">全屏</button>
+            <select id="speedControl">
+                <option value="0.5">0.5x</option>
+                <option value="1" selected>1x</option>
+                <option value="1.5">1.5x</option>
+                <option value="2">2x</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- 视频详情区域 -->
+    <div class="video-details">
+        <!-- 视频海报图片 -->
+        <div class="video-poster">
+            <img src="https://t1.021huaying.com/uploads/2023-08-25/4a/2a4767d7b67470c39c4e6355feef9ef7.webp" id = "video_poster"
+                 alt="视频海报">
+        </div>
+
+        <!-- 视频信息区域 -->
+        <div class="video-info">
+            <h2 class="video-title" id = 'video-title'>视频标题</h2>
+            <p class="video-description" id = "video-description">这是视频的简介部分。</p>
+
+            <!-- 播放源选择 -->
+            <div class="source-selector">
+                <label for="source">选择播放源:</label>
+                <select id="source" class = ”select“>
+                    <option value="source1">源1</option>
+                    <option value="source2">源2</option>
+                    <option value="source3">源3</option>
+                </select>
+            </div>
+
+            <!-- 集数选择 -->
+            <div class="episode-selector">
+                <label for="episode">选择集数:</label>
+                <select id="episode">
+                    <option value="1">第1集</option>
+                    <option value="2">第2集</option>
+                    <option value="3">第3集</option>
+                    <!-- 更多集数选项 -->
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="./js/play_page.js"></script>
+
+</body>
+</html>

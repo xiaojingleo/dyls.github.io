@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <style>
+        .filter-container {
+            width: 60%;
+            margin: 0 auto;
+            padding: 20px;
+            /*border: 1px solid #ccc;*/
+            /*border-radius: 8px;*/
+            /*box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);*/
+        }
+
+        .filter-group {
+            margin-bottom: 15px;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .filter-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .filter-button {
+            padding: 8px 12px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            position: relative;
+        }
+
+        .filter-button:hover {
+            background-color: #f0f0f0;
+        }
+
+        .filter-button.active {
+            background-color: #007bff;
+            color: #fff;
+            border-color: #007bff;
+        }
+
+        .filter-button.default {
+            background-color: #e0e0e0;
+            color: #000;
+        }
+
+        .main {
+            padding: 16px 16px;
+            width: 60%;
+            max-width: 80%;
+            margin: 0 auto;
+        }
+
+
+        .main .form {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            margin-bottom: 24px;
+        }
+
+        .main .form input {
+            flex: 1;
+            height: 40px;
+            border-top: 1px solid #0e90d2;
+            border-left: 1px solid #0e90d2;
+            border-bottom: 1px solid #0e90d2;
+            border-right: 0px;
+            padding-left: 10px;
+        }
+
+        .main .form input:focus {
+            outline: #0e90d2;
+        }
+
+        .main .form img {
+            margin-left: -4px;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+        }
+
+        .main #share {
+            text-align: center;
+            margin-top: 24px;
+            margin-bottom: 24px;
+        }
+
+
+        .main .alert a {
+            color: #501445;
+            text-decoration: underline;
+        }
+
+        .main h2 {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        /*    自定义*/
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        .search-container {
+            display: flex; /* 使用flexbox布局 */
+            align-items: center; /* 垂直居中 */
+        }
+
+        .search-box {
+            flex: 1; /* 输入框占据剩余空间 */
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px 0 0 4px; /* 圆角效果，与按钮配合 */
+        }
+
+        .search-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            background-color: #007bff;
+            border: none;
+            border-radius: 0 4px 4px 0; /* 圆角效果，与输入框配合 */
+            cursor: pointer;
+        }
+
+        .search-button:hover {
+            background-color: #0056b3;
+        }
+
+        .suggestions {
+            display: none;
+            position: absolute;
+            top: 100%; /* 紧贴输入框下方 */
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-height: 200px; /* 限制高度以防内容过多 */
+            overflow-y: auto; /* 允许垂直滚动 */
+        }
+
+        .suggestion {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+
+    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>电影视频网站</title>
+    <link rel="stylesheet" href="css/index_page.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.staticfile.org/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/2.3.1/jsencrypt.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.0.0-beta.1/jsencrypt.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+    <script src="js/common.js"></script>
+    <script src="./js/index.js"></script>
+
+</head>
+<body>
+<header>
+    <h1>电影视频网站</h1>
+    <nav>
+        <ul class="nav-list">
+            <li><a href="#" class="nav-link" data-value="-1" >首页</a></li>
+            <li><a href="#" class="nav-link" data-value="1"  >电影</a></li>
+            <li><a href="#" class="nav-link" data-value="2"  >剧集</a></li>
+            <li><a href="#" class="nav-link" data-value="3"  >综艺</a></li>
+            <li><a href="#" class="nav-link" data-value="4"  >动漫</a></li>
+            <li><a href="#" class="nav-link" data-value="5"  >爽剧</a></li>
+        </ul>
+    </nav>
+
+</header>
+<main class="main">
+    <div class="search-container">
+        <input type="text" value="" class="search-box" id="searchBox" placeholder="输入搜索关键词...">
+        <button class="search-button" >搜索</button>
+        <!--        <div class="suggestions" id="suggestions"></div>-->
+    </div>
+</main>
+
+<div class="filter-container" id="filter-container-id" hidden="hidden">
+    <div class="filter-group">
+        <!--        <label for="sort">综合：</label>-->
+        <div class="filter-buttons" id="zonghe_id">
+
+        </div>
+    </div>
+
+    <div class="filter-group">
+        <!--        <label for="type">类型：</label>-->
+        <div class="filter-buttons" id="leixing_id">
+
+        </div>
+    </div>
+
+    <div class="filter-group">
+        <!--        <label for="region">地区：</label>-->
+        <div class="filter-buttons" id="diqu_id">
+
+        </div>
+    </div>
+
+    <div class="filter-group">
+        <!--        <label for="year">年份：</label>-->
+        <div class="filter-buttons" id="year_id">
+
+        </div>
+    </div>
+</div>
+
+
+<section class="fixed-options">
+    <div class="option" id="search-result">
+        <!--            <h2>&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;最新上线·全网热播&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;</h2>-->
+    </div>
+    <div class="option" id="pageControler" hidden="hidden">
+        <div class="pagination-container">
+            <button class="pagination-button" id="firstPage">首页</button>
+            <button class="pagination-button" id="prevPage">上一页</button>
+            <span id="pageInfo" class="page-info"></span>
+            <button class="pagination-button" id="nextPage">下一页</button>
+            <button class="pagination-button" id="lastPage">末页</button>
+        </div>
+    </div>
+    <div class="option" id="containers">
+        <!--            <h2>&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;最新上线·全网热播&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;</h2>-->
+    </div>
+</section>
+
+<footer>
+    <p>版权信息 &copy; 2023</p>
+</footer>
+
+</body>
+</html>
