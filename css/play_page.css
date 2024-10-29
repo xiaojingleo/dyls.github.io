@@ -46,7 +46,7 @@ body {
 .video-description {
     margin: 0 0 20px;
     font-size: 16px;
-    color: #555;
+    /*color: #555;*/
 }
 
 .source-selector, .episode-selector {

@@ -101,7 +101,7 @@ main {
     background: #f4f4f4;
     padding: 1em;
     border-radius: 5px;
-    width: calc(66% - 2em);
+    width: calc(80% - 2em);
     box-sizing: border-box;
 }
 

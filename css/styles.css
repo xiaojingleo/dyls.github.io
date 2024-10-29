@@ -12,6 +12,7 @@
     position: relative; /* 为可能的绝对定位子元素提供上下文 */
     /* overflow: hidden; 可以保留，但如果标签需要超出图片边界，请移除或调整 */
 }
+
 .list-item {
     width: calc(33% - 1px); /* 调整为三分之一宽度，减去gap */
     box-sizing: border-box;
@@ -52,3 +53,54 @@
     font-weight: bold; /* 标题字体粗细 */
     z-index: 1; /* 确保标题也在图片上方，但通常标签的z-index应该更高或相同，取决于布局需求 */
 }
+
+.filter-container {
+    width: 60%;
+    margin: 0 auto;
+    padding: 20px;
+    /*border: 1px solid #ccc;*/
+    /*border-radius: 8px;*/
+    /*box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);*/
+}
+
+.filter-group {
+    margin-bottom: 15px;
+}
+
+.filter-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.filter-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.filter-button {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+    position: relative;
+}
+
+.filter-button:hover {
+    background-color: #f0f0f0;
+    color: #c900f6; /* 可选：添加悬停时文字颜色的变化，默认为黑色 */
+}
+
+.filter-button.active {
+    background-color: #007bff;
+    color: #fff;
+    border-color: #007bff;
+}
+
+/*.filter-button.default {*/
+/*    background-color: #C61212FF;*/
+/*    color: #18DC20FF; !* 修改为白色，以便在黑色背景上可见 *!*/
+/*}*/

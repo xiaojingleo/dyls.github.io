@@ -105,23 +105,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const sourceSelector = document.getElementById('source');
     const episodeSelector = document.getElementById('episode');
 
-    // 播放源选择变化时的事件处理
-    sourceSelector.addEventListener('change', function () {
-        const selectedSource = sourceSelector.value;
-        console.log('选择的播放源:', selectedSource);
-        // 这里可以添加更换播放源的逻辑，例如更新视频URL等
-        get_play_url_list(global_id, selectedSource);
-    });
 
     // 集数选择变化时的事件处理
-    episodeSelector.addEventListener('change', function () {
-        // 获取当前选中的选项的值
-        // 这里可以添加更换集数的逻辑，例如更新视频内容等
-        const js_data = JSON.parse(episodeSelector.value);
-        // console.log('选择的集数:', data);
-        document.title = g_title + "-" + js_data.episode_name;
-        play_url_plus(js_data);
-    });
+    // episodeSelector.addEventListener('click', function () {
+    //     // 获取当前选中的选项的值
+    //     // 这里可以添加更换集数的逻辑，例如更新视频内容等
+    //     const js_data = JSON.parse(episodeSelector.value);
+    //     // console.log('选择的集数:', data);
+    //     document.title = g_title + "-" + js_data.episode_name;
+    //     play_url_plus(js_data);
+    // });
 
 
     function play_url_plus(js_data) {
@@ -150,9 +143,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 success: function (response, xml) {
                     // console.log(response);
                     response = JSON.parse(response);
-                    var data = response['data'];
-                    var play_url = data['play_url'];
-                    play_url(play_url);
+                    let data = response['data'];
+                    let url = data['play_url'];
+                    play_url(url);
                 },
                 fail: function (status) {
                     console.log(status);
@@ -230,26 +223,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
         for (let i = 0; i < play_list.length; i++) {
             //添加播放源
-            const option = document.createElement('option');
-            option.value = play_list[i]['code'];
-            option.text = play_list[i]['name'];
+            const option = document.createElement('button');
+            option.className = 'filter-button';
+            option.dataset.filter = 'source';
+            option.dataset.value = play_list[i]['code'];
+            option.innerHTML = play_list[i]['name'];
+            if(i === 0) {
+                option.classList.add('active');
+            }
             source_select.appendChild(option);
             //如果找到地址，直接把地址添加到集数中，并且自动播放第一个
             if (play_list[i]['list'].length > 0 && play_list[i]['list'][0]['play_url'].indexOf("m3u8") !== -1) {
                 for (let j = 0; j < play_list[i]['list'].length; j++) {
-                    const episode_option = document.createElement('option');
-                    episode_option.value = JSON.stringify(play_list[i]["list"][j])
-                    episode_option.text = play_list[i]['list'][j]['episode_name'];
-                    // epsisode_option.dataset.data = play_list[i]['list'][j];
+                    const episode_option = document.createElement('button');
+                    episode_option.className = 'filter-button';
+                    episode_option.dataset.filter = 'episode';
+                    episode_option.dataset.value = JSON.stringify(play_list[i]["list"][j])
+                    episode_option.innerHTML = play_list[i]['list'][j]['episode_name'];
+
                     episode_select.append(episode_option)
                     if (j === 0) {
+                        episode_select.classList.add('active');
                         episode_select.value = play_list[i]["list"][j]['play_url'];
                     }
                 }
             }
         }
+        add_filter_button_event();
         if (episode_select.innerHTML === "") {
             get_play_url_list(movie['id'], play_list[0]['code']);
+
         }
     }
 
@@ -271,23 +274,55 @@ document.addEventListener('DOMContentLoaded', () => {
             success: function (response, xml) {
                 // console.log(response);
                 response = JSON.parse(response);
-                datas = response['data'];
+                let datas = response['data'];
                 const episode_select = document.getElementById('episode');
                 episode_select.innerHTML = "";//清空内容
                 for (let i = 0; i < datas.length; i++) {
-                    const episode_option = document.createElement('option');
-                    episode_option.value = JSON.stringify(datas[i]);
-                    episode_option.text = datas[i]['episode_name'];
+                    const episode_button = document.createElement('button');
+                    episode_button.className = 'filter-button';
+                    episode_button.dataset.filter = 'episode';
+                    episode_button.value = JSON.stringify(datas[i]);
+                    episode_button.innerHTML = datas[i]['episode_name'];
                     // episode_option.dataset.data = datas[i];
-                    episode_select.append(episode_option)
+                    episode_select.append(episode_button)
                     if (i === 0) {
                         play_url_plus(datas[i]);
                     }
-
                 }
+                add_filter_button_event();
             },
             fail: function (status) {
                 console.log(status);
+            }
+        });
+    }
+
+
+    function add_filter_button_event() {
+        const filterButtons = document.querySelectorAll('.filter-button');
+
+        filterButtons.forEach(button => {
+            button.addEventListener('click', function (handle) {
+                // 移除当前筛选组内所有按钮的active类（允许多选，所以只针对当前组）
+                const filterGroup = this.closest('.filter-buttons');
+                filterGroup.querySelectorAll('.filter-button').forEach(b => b.classList.remove('active'));
+                // 为当前按钮添加active类
+                this.classList.add('active');
+                // 获取当前按钮的data属性
+                const filter = handle.target.dataset.filter;
+                if (filter === 'source') {
+                    get_play_url_list(global_id, this.dataset.value);
+                } else if (filter === 'episode') {
+                    const data = JSON.parse(this.value);
+                    play_url_plus(data);
+                }
+            });
+        });
+
+        // 初始化时确保每个大选项中的“全部”按钮是active的（虽然HTML中已经设置，但这里再次确保）
+        document.querySelectorAll('.filter-group .default').forEach(button => {
+            if (!button.classList.contains('active')) {
+                button.classList.add('active');
             }
         });
     }

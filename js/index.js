@@ -281,7 +281,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function _search() {
-        let keyword = $("#searchBox").val()
+        let keyword = $("#search_text").val()
         if (keyword !== '') {
             get_search_result(keyword)
         } else {
@@ -289,6 +289,13 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+// 获取输入框和文本域元素
+    const inputElement = document.getElementById('search_text');
+    inputElement.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+            _search();
+        }
+    });
 
     function init_movie_list() {
         let pack = get_pack(JSON.stringify(global_params));
@@ -536,6 +543,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     }
+
     addListener();
 });
 

@@ -2,56 +2,6 @@
 <html lang="zh-CN">
 <head>
     <style>
-        .filter-container {
-            width: 60%;
-            margin: 0 auto;
-            padding: 20px;
-            /*border: 1px solid #ccc;*/
-            /*border-radius: 8px;*/
-            /*box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);*/
-        }
-
-        .filter-group {
-            margin-bottom: 15px;
-        }
-
-        .filter-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        .filter-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
-        }
-
-        .filter-button {
-            padding: 8px 12px;
-            font-size: 14px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s, color 0.3s;
-            position: relative;
-        }
-
-        .filter-button:hover {
-            background-color: #f0f0f0;
-        }
-
-        .filter-button.active {
-            background-color: #007bff;
-            color: #fff;
-            border-color: #007bff;
-        }
-
-        .filter-button.default {
-            background-color: #e0e0e0;
-            color: #000;
-        }
-
         .main {
             padding: 16px 16px;
             width: 60%;
@@ -189,19 +139,19 @@
     <nav>
         <ul class="nav-list">
             <li><a href="#" class="nav-link" data-value="-1" >首页</a></li>
-            <li><a href="#" class="nav-link" data-value="1"  >电影</a></li>
-            <li><a href="#" class="nav-link" data-value="2"  >剧集</a></li>
-            <li><a href="#" class="nav-link" data-value="3"  >综艺</a></li>
-            <li><a href="#" class="nav-link" data-value="4"  >动漫</a></li>
-            <li><a href="#" class="nav-link" data-value="5"  >爽剧</a></li>
+            <li><a href="#" class="nav-link" data-value="0"  >电影</a></li>
+            <li><a href="#" class="nav-link" data-value="1"  >剧集</a></li>
+            <li><a href="#" class="nav-link" data-value="2"  >综艺</a></li>
+            <li><a href="#" class="nav-link" data-value="3"  >动漫</a></li>
+            <li><a href="#" class="nav-link" data-value="4"  >爽剧</a></li>
         </ul>
     </nav>
 
 </header>
 <main class="main">
     <div class="search-container">
-        <input type="text" value="" class="search-box" id="searchBox" placeholder="输入搜索关键词...">
-        <button class="search-button" >搜索</button>
+        <input type="text" value="" class="search-box" id="search_text" placeholder="输入搜索关键词...">
+        <button class="search-button" id="searchBox">搜索</button>
         <!--        <div class="suggestions" id="suggestions"></div>-->
     </div>
 </main>
