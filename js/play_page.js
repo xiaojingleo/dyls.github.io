@@ -353,12 +353,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     videoPlayer.addEventListener('ended', function () {
         currentIndex = (currentIndex + 1) % videoFiles.length;
-        play_url_plus(videoFiles[currentIndex]);
+        let data = {"play_url": videoFiles[currentIndex]}
+        play_url_plus(data);
         const filterButtons = document.querySelectorAll('.filter-button');
         filterButtons.forEach(button => {
-            button.classList.remove('active');
-            if (button.dataset.value === videoFiles[currentIndex]) {
-                button.classList.add('active');
+            if (button.dataset.filter === 'episode') {
+                if (JSON.parse(button.value).play_url === videoFiles[currentIndex]) {
+                    button.classList.add('active');
+                } else {
+                    button.classList.remove('active');
+                }
             }
         });
     });

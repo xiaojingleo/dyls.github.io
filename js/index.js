@@ -283,7 +283,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function _search() {
         global_total_page = 1;
         global_page = 1;
-        let keyword = $("#search_text").val()
+        let keyword = document.getElementById('search_text').value;// $("#search_text").val()
         if (keyword !== '') {
             get_search_result(keyword)
         } else {
