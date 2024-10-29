@@ -100,7 +100,7 @@
     border-color: #007bff;
 }
 
-/*.filter-button.default {*/
-/*    background-color: #C61212FF;*/
-/*    color: #18DC20FF; !* 修改为白色，以便在黑色背景上可见 *!*/
-/*}*/
+.filter-button.default {
+    background-color: #f0f0f0;
+    color: #000; /* 修改为白色，以便在黑色背景上可见 */
+}
