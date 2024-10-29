@@ -3,7 +3,7 @@
 
 ## 效果预览
 
-https://m3u8player.org
+[https://m3u8player.org](https://xiaojingleo.github.io/dyls.github.io/)
 
 
 ## 部署步骤
