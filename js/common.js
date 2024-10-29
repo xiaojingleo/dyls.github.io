@@ -29,13 +29,34 @@ function ajax(options) {
     }
 
     //连接 和 发送 - 第二步
-    if (options.type == "GET") {
+    if (options.type === "GET") {
         xhr.open("GET", options.url + "?" + params, true);
+        xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+        xhr.setRequestHeader("accept", "application/prs.55App.v2+json");
+        xhr.setRequestHeader("Access-Control-Allow-Origin","*");
+        xhr.setRequestHeader("x-client-version","3096");
+        xhr.setRequestHeader("x-app-version","3096");
+        xhr.setRequestHeader("x-app-lang","zh_CN");
+        // xhr.setRequestHeader("user-agent", "Android");
+        xhr.setRequestHeader("timestamp", get_timestamp());
+        xhr.setRequestHeader("x-client-setting", "{\"pure-mode\":1}");
+        xhr.setRequestHeader("x-client-uuid", "{\"device_id\":\"d92aca9bc1e6adfeb80432c5bbbe3952\", \"type\":1,\"brand\":\"realme\", \"model\":\"RMX3783\", \"system_version\":28, \"sdk_version\":\"3.1.0.5\"}");
+
         xhr.send();
-    } else if (options.type == "POST") {
+    } else if (options.type === "POST") {
         xhr.open("POST", options.url, true);
         //设置表单提交时的内容类型
-        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+        xhr.setRequestHeader("accept", "application/prs.55App.v2+json");
+        xhr.setRequestHeader("Access-Control-Allow-Origin","*");
+        xhr.setRequestHeader("x-client-version","3096");
+        xhr.setRequestHeader("x-app-version","3096");
+        xhr.setRequestHeader("x-app-lang","zh_CN");
+        // xhr.setRequestHeader("user-agent", "Android");
+        xhr.setRequestHeader("timestamp", get_timestamp());
+        xhr.setRequestHeader("x-client-setting", "{\"pure-mode\":1}");
+        xhr.setRequestHeader("x-client-uuid", "{\"device_id\":\"d92aca9bc1e6adfeb80432c5bbbe3952\", \"type\":1,\"brand\":\"realme\", \"model\":\"RMX3783\", \"system_version\":28, \"sdk_version\":\"3.1.0.5\"}");
+
         xhr.send(params);
     }
 }

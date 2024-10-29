@@ -131,3 +131,10 @@ footer {
     color: #333;
     padding: 0 10px; /* 给页码信息一些内边距 */
 }
+:root {
+    --brightness: 1;
+}
+
+body, html {
+    filter: brightness(var(--brightness, 1));
+}

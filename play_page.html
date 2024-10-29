@@ -5,35 +5,6 @@
     <meta charset="UTF-8">
     <title>播放页面</title>
 
-    <style>
-        .selection-container {
-            margin: 20px;
-            display: flex; /* 使用flexbox布局 */
-            flex-direction: row; /* 子元素水平排列 */
-            align-items: center; /* 垂直居中 */
-        }
-
-        .selection-container h3 {
-            margin-right: 10px; /* 给标题和按钮之间一些间距 */
-        }
-
-        .source-button, .episode-button {
-            margin: 5px;
-            padding: 10px;
-            border: 2px solid #ccc;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s, border-color 0.3s;
-            flex-shrink: 0; /* 防止按钮在容器空间不足时缩小 */
-        }
-
-        .selected {
-            background-color: #007BFF;
-            color: white;
-            border-color: #0056b3;
-        }
-    </style>
-
     <link rel="stylesheet" href="./css/play_page.css">
     <link rel="stylesheet" href="./css/styles.css">
     <script src="./js/hls.min.js"></script>

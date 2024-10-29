@@ -228,7 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
             option.dataset.filter = 'source';
             option.dataset.value = play_list[i]['code'];
             option.innerHTML = play_list[i]['name'];
-            if(i === 0) {
+            if (i === 0) {
                 option.classList.add('active');
             }
             source_select.appendChild(option);
@@ -256,12 +256,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function get_play_url_list(id, from_code, play_url = "undefine", episode_id = "13283680") {
-        var json_data = {"movie_id": id, "from_code": from_code, "timestamp": get_timestamp()}
-        var url = 'https://app-v1.ecoliving168.com/api/v1/movie_addr/parse_url'
-        var par = "";
-        url = "https://app-v1.ecoliving168.com/api/v1/movie_addr/list"
-        par = JSON.stringify(json_data)
+    function get_play_url_list(id, from_code) {
+        const json_data = {"movie_id": id, "from_code": from_code, "timestamp": get_timestamp()}
+        // var url = 'https://app-v1.ecoliving168.com/api/v1/movie_addr/parse_url'
+        // var par = "";
+        const url = "https://app-v1.ecoliving168.com/api/v1/movie_addr/list"
+        const par = JSON.stringify(json_data)
 
         const pack = get_pack(par);
         const signature = get_sign(pack);
@@ -283,13 +283,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     episode_button.dataset.filter = 'episode';
                     episode_button.value = JSON.stringify(datas[i]);
                     episode_button.innerHTML = datas[i]['episode_name'];
-                    // episode_option.dataset.data = datas[i];
+                    episode_button.addEventListener('click', function (handle)
+                    {
+                        const filterGroup = this.closest('.filter-buttons');
+                        filterGroup.querySelectorAll('.filter-button').forEach(b => b.classList.remove('active'));
+                        // 为当前按钮添加active类
+                        this.classList.add('active');
+                        const data = JSON.parse(handle.target.value);
+                        play_url_plus(data);
+                    });
                     episode_select.append(episode_button)
                     if (i === 0) {
                         play_url_plus(datas[i]);
+                        episode_button.classList.add('active');
                     }
                 }
-                add_filter_button_event();
+                // add_filter_button_event();
             },
             fail: function (status) {
                 console.log(status);
