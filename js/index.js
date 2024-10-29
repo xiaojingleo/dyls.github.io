@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
-    let global_page = 1;
+    // let global_page = 1;
+    let currentPage = 1;
     let global_total_page = 10;
     let global_type_id = 0;
     let global_params = {
@@ -97,8 +98,6 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelector('nav ul.nav-list li a.nav-link:first-of-type').classList.add('active');
 
 
-    const totalPages = 10; // 动态设定总页数
-    let currentPage = 1;
 
     const firstPageButton = document.getElementById('firstPage');
     const prevPageButton = document.getElementById('prevPage');
@@ -109,11 +108,11 @@ document.addEventListener('DOMContentLoaded', function () {
     // const content = document.getElementById('content');
 
     function updatePageInfo() {
-        pageInfo.textContent = `第 ${global_page} 页 / 共 ${global_total_page} 页`;
+        pageInfo.textContent = `第 ${currentPage} 页 / 共 ${global_total_page} 页`;
     }
 
     function updateContent() {
-        global_params.page = global_page
+        global_params.page = currentPage
         init_movie_list();
     }
 
@@ -121,29 +120,29 @@ document.addEventListener('DOMContentLoaded', function () {
     searchbutton.addEventListener('click', _search);
 
     firstPageButton.addEventListener('click', () => {
-        global_page = 1;
+        currentPage = 1;
         // updatePageInfo();
         updateContent();
     });
 
     prevPageButton.addEventListener('click', () => {
         if (currentPage > 1) {
-            global_page--;
+            currentPage--;
             // updatePageInfo();
             updateContent();
         }
     });
 
     nextPageButton.addEventListener('click', () => {
-        if (currentPage < totalPages) {
-            global_page++;
+        if (currentPage < global_total_page) {
+            currentPage++;
             // updatePageInfo();
             updateContent();
         }
     });
 
     lastPageButton.addEventListener('click', () => {
-        global_page = global_total_page;
+        currentPage = global_total_page;
         // updatePageInfo();
         updateContent();
     });
@@ -155,6 +154,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function addItem(items, containerid) {
         // 获取容器元素
         const container = document.getElementById(containerid);
+        containers.hidden = false;
         const h3_container = document.createElement('h3');
         h3_container.textContent = items['title'];
         container.appendChild(h3_container);
@@ -282,7 +282,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function _search() {
         global_total_page = 1;
-        global_page = 1;
+        currentPage = 1;
         let keyword = document.getElementById('search_text').value;// $("#search_text").val()
         if (keyword !== '') {
             get_search_result(keyword)
@@ -312,10 +312,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 // 此处放成功后执行的代码
                 response = JSON.parse(response).data;
                 global_total_page = Math.ceil(response.total / response.pageSize);
-                global_page = response.page;
+                currentPage = response.page;
                 updatePageInfo();
-                add_search_Item(response['list'], '筛选结果');
-
+                add_search_Item(response['list'], config_json.data.index_top_nav[global_type_id].name);
             },
             fail: function (status) {
                 // 此处放失败后执行的代码
@@ -496,11 +495,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 global_params[this.dataset.filter] = this.dataset.value;
                 global_params['timestamp'] = get_timestamp();
                 init_movie_list();
-                // 如果点击的是“全部”按钮，则还需要处理其他组的“全部”按钮状态（可选，根据需求来）
-                // 这里我们简单处理为不干扰其他组
-
-                // 在这里添加筛选逻辑（例如，更新电影列表）
-                // console.log(`筛选条件：${this.dataset.filter} = ${this.dataset.value}`);
             });
         });
 
@@ -513,9 +507,12 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function click_header(type_id) {
+        const container = document.getElementById("containers");
+        container.hidden = true;
         switch (type_id) {
             case -1:
                 global_type_id = 0;
+                container.hidden = false;
                 break;
             case 1:
             case 2:
@@ -529,8 +526,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         const filter = document.getElementById('filter-container-id');
         const pageControler = document.getElementById('pageControler');
+
         filter.hidden = type_id === -1;
         pageControler.hidden = type_id === -1;
+
         init_filter(type_id);
     }
 
