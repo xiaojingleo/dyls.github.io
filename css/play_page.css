@@ -69,11 +69,15 @@ select {
     position: relative;
     width: 100%;
     max-width: 1200px;
+    margin: 0 auto; /* 居中显示 */
+    overflow: hidden; /* 隐藏超出容器的内容 */
 }
 
 video {
     width: 100%;
     height: auto;
+    top: 0; /* 顶部对齐 */
+    left: 0; /* 左侧对齐 */
 }
 
 .controls {

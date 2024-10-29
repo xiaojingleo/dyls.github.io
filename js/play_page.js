@@ -249,20 +249,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     episode_option.dataset.value = JSON.stringify(play_list[i]["list"][j])
                     episode_option.innerHTML = play_list[i]['list'][j]['episode_name'];
 
-                    episode_select.append(episode_option)
                     videoFiles.push(play_list[i]["list"][j]['play_url']);
                     currentIndex = 0;
                     if (j === 0) {
-                        episode_select.value = play_list[i]["list"][j]['play_url'];
-                        episode_select.classList.add('active');
+                        episode_option.classList.add('active');
+                        // episode_select.value = play_list[i]["list"][j]['play_url'];
                     }
+                    episode_select.append(episode_option)
                 }
             }
         }
         add_filter_button_event();
         if (episode_select.innerHTML === "") {
             get_play_url_list(movie['id'], play_list[0]['code']);
-
+        }else
+        {
+            play_url_plus({"play_url": videoFiles[currentIndex]});
         }
     }
 
@@ -348,8 +350,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    var videoFiles = [];
-    let currentIndex = 0;
 
     videoPlayer.addEventListener('ended', function () {
         currentIndex = (currentIndex + 1) % videoFiles.length;
@@ -370,3 +370,47 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 
+
+let videoFiles = [];
+let currentIndex = 0;
+
+async function downloadM3U8() {
+    const m3u8Url = videoFiles[currentIndex];
+
+    try {
+        // Step 1: Fetch M3U8 file content
+        const response = await fetch(m3u8Url);
+        const m3u8Text = await response.text();
+
+        // Step 2: Parse M3U8 file
+        const lines = m3u8Text.split('\n');
+        const baseUri = new URL(m3u8Url).origin;
+        const tsUrls = lines
+            .filter(line => line.endsWith('.ts'))
+            .map(line => new URL(line, baseUri).href);
+
+        // Step 3: Download TS segments
+        const tsBlobs = await Promise.all(tsUrls.map(url => fetchAndBlob(url)));
+
+        // Step 4: Create a Blob for the entire video (this step is simplified)
+        // Normally, you would need to concatenate the TS segments correctly
+        // and possibly convert them to a single MP4 file using a backend service or FFmpeg.js
+        const videoBlob = new Blob(tsBlobs, { type: 'video/mp2t' });
+
+        // Step 5: Create a download link and trigger the download
+        const downloadLink = document.createElement('a');
+        downloadLink.href = URL.createObjectURL(videoBlob);
+        downloadLink.download = 'downloaded_video.ts'; // Change extension if you know the final format
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+
+    } catch (error) {
+        console.error('Error downloading M3U8:', error);
+    }
+}
+
+async function fetchAndBlob(url) {
+    const response = await fetch(url);
+    return response.blob();
+}
