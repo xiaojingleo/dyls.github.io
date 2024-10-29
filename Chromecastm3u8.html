@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chromecast m3u8</title>
+    <script type="text/javascript" src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
+    <script>
+        // 初始化 Cast SDK
+        window.castReceiverManager = null;
+        window.initCastPlayer = function() {
+            const applicationID = 'YOUR_CHROMECAST_APP_ID'; // 替换为你的 Chromecast 应用 ID
+            const sessionRequest = new chrome.cast.SessionRequest(applicationID);
+            const apiConfig = new chrome.cast.ApiConfig(sessionRequest,
+                sessionListener,
+                receiverListener);
+            chrome.cast.initialize(apiConfig, onInitSuccess, onError);
+        };
+
+        const sessionListener = function(session) {
+            console.log('New session ID: ' + session.sessionId);
+            window.session = session;
+            if (session.media) {
+                console.log('Found existing media session: ' + session.media.sessionId);
+                window.mediaSession = session.media;
+                window.mediaSession.addUpdateListener(mediaStatusUpdateListener);
+            }
+            window.castReceiverManager = new cast.receiver.CastReceiverManager(session.receiver.friendlyName);
+            loadMedia();
+        };
+
+        const receiverListener = function(availability) {
+            if (availability === 'available') {
+                console.log('Receiver is available.');
+                initializeCastPlayer();
+            } else {
+                console.log('No Cast devices found.');
+            }
+        };
+
+        const onInitSuccess = function() {
+            console.log('Cast initialized successfully');
+            window.castApiInitialized = true;
+            if (window.castApiInitialized && window.castDevicesUpdated) {
+                initCastPlayer();
+            }
+        };
+
+        const onError = function(error) {
+            console.error('Error initializing Cast: ' + error.message);
+        };
+
+        const mediaStatusUpdateListener = function(isAlive) {
+            if (!isAlive) {
+                console.log('Media session is not active');
+                window.mediaSession = null;
+            }
+        };
+
+        const initializeCastPlayer = function() {
+            if (window.castReceiverManager) {
+                window.castReceiverManager.start();
+            }
+        };
+
+        const loadMedia = function() {
+            if (!window.session) {
+                console.error('No session');
+                return;
+            }
+
+            const mediaInfo = new chrome.cast.media.MediaInfo('https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8'); // 替换为你的 m3u8 URL
+            mediaInfo.contentType = 'application/x-mpegURL';
+            mediaInfo.metadata = new chrome.cast.media.GenericMediaMetadata();
+            mediaInfo.metadata.metadataType = chrome.cast.media.MetadataType.GENERIC;
+            mediaInfo.metadata.title = 'Your Video Title';
+
+            const request = new chrome.cast.media.LoadRequest(mediaInfo);
+            request.autoplay = true;
+            request.currentTime = 0;
+            window.session.loadMedia(request,
+                function() {
+                    console.log('Media loaded successfully');
+                },
+                onError);
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (chrome.cast && chrome.cast.isAvailable) {
+                window.castApiInitialized = false;
+                window.castDevicesUpdated = false;
+                chrome.cast.requestSession(function(session) {
+                    window.castDevicesUpdated = true;
+                    if (window.castApiInitialized) {
+                        initCastPlayer();
+                    }
+                });
+                initCastPlayer();
+            } else {
+                console.error('Cast API not available');
+            }
+        });
+    </script>
+</head>
+<body>
+    <h1>Chromecast m3u8 Example</h1>
+    <button onclick="initCastPlayer()">Start Casting</button>
+</body>
+</html>

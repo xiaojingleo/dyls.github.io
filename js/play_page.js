@@ -170,6 +170,12 @@ document.addEventListener('DOMContentLoaded', () => {
             player = document.getElementById('videoPlayer');
             hls = new Hls();
         }
+        for (let i = 0; i < videoFiles.length; i++) {
+            if (videoFiles[i] === play_url) {
+                currentIndex = i;
+                break;
+            }
+        }
         hls.loadSource(play_url);
         hls.attachMedia(player);
         hls.on(Hls.Events.MANIFEST_PARSED, function () {
@@ -233,7 +239,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             source_select.appendChild(option);
             //如果找到地址，直接把地址添加到集数中，并且自动播放第一个
+
             if (play_list[i]['list'].length > 0 && play_list[i]['list'][0]['play_url'].indexOf("m3u8") !== -1) {
+                videoFiles = [];
                 for (let j = 0; j < play_list[i]['list'].length; j++) {
                     const episode_option = document.createElement('button');
                     episode_option.className = 'filter-button';
@@ -242,9 +250,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     episode_option.innerHTML = play_list[i]['list'][j]['episode_name'];
 
                     episode_select.append(episode_option)
+                    videoFiles.push(play_list[i]["list"][j]['play_url']);
+                    currentIndex = 0;
                     if (j === 0) {
-                        episode_select.classList.add('active');
                         episode_select.value = play_list[i]["list"][j]['play_url'];
+                        episode_select.classList.add('active');
                     }
                 }
             }
@@ -277,14 +287,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 let datas = response['data'];
                 const episode_select = document.getElementById('episode');
                 episode_select.innerHTML = "";//清空内容
+                videoFiles = [];
                 for (let i = 0; i < datas.length; i++) {
                     const episode_button = document.createElement('button');
                     episode_button.className = 'filter-button';
                     episode_button.dataset.filter = 'episode';
                     episode_button.value = JSON.stringify(datas[i]);
                     episode_button.innerHTML = datas[i]['episode_name'];
-                    episode_button.addEventListener('click', function (handle)
-                    {
+                    episode_button.addEventListener('click', function (handle) {
                         const filterGroup = this.closest('.filter-buttons');
                         filterGroup.querySelectorAll('.filter-button').forEach(b => b.classList.remove('active'));
                         // 为当前按钮添加active类
@@ -293,6 +303,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         play_url_plus(data);
                     });
                     episode_select.append(episode_button)
+                    videoFiles.push(datas[i]['play_url']);
+                    currentIndex = 0;
                     if (i === 0) {
                         play_url_plus(datas[i]);
                         episode_button.classList.add('active');
@@ -335,6 +347,22 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    var videoFiles = [];
+    let currentIndex = 0;
+
+    videoPlayer.addEventListener('ended', function () {
+        currentIndex = (currentIndex + 1) % videoFiles.length;
+        play_url_plus(videoFiles[currentIndex]);
+        const filterButtons = document.querySelectorAll('.filter-button');
+        filterButtons.forEach(button => {
+            button.classList.remove('active');
+            if (button.dataset.value === videoFiles[currentIndex]) {
+                button.classList.add('active');
+            }
+        });
+    });
+
 
 });
 

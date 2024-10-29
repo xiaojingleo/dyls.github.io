@@ -7,49 +7,12 @@ function play(play_url) {
     if (player === undefined) {
         player = document.getElementById('player-container-id');
         hls = new Hls();
-
-        // player = TCPlayer('player-container-id', {
-        //     sources: [{
-        //         src: url,
-        //     }],
-        //     // licenseUrl需自己去腾讯云申请
-        //     licenseUrl: 'https://xxxxxxxxxxxxxx',
-        // });
     }
     hls.loadSource(play_url);
     hls.attachMedia(player);
     hls.on(Hls.Events.MANIFEST_PARSED, function () {
         player.play();
     });
-    // var url = "https://app-v1.ecoliving168.com/api/v1/movie_addr/list";
-    // var data = {
-    //     pack: 'Jm31drzXH1kh6qTPsTHmoMDLjzFz0sGHctxIvHhJ9-3M57LFGsRebAClOcVIM1WuMgVNNcx02zZrr5LOlNctAHMgzy19az_BFdHrofUhooomi8SB8rjd2qfTX463QcR3g8R8Ij46YVufOkQJF0a71B4jrgfaxqlydW4ChjO2mpRaGZQUz0YsubWPKviQhi9H3VUIFKJM7CJCP3s6I7lvEIzMWNlDbwPtnbLtXDTUSwn4gHWQ06MbDBoJGhcc_dAiXH83cTym9Qbcx5jwBC5SqhxVoklmo_c64hws_r39BgHOX2OPpo95VI71ypVyGv2WPoDfYFvCmEmyb2EROZJkgA',
-    //     signature: '08010b086b5bf785448cd4567a35fbe2'
-    // };
-    //
-    // ajax({
-    //     url: url,              //请求地址
-    //     type: "GET",                       //请求方式
-    //     data: data,        //请求参数
-    //     dataType: "json",
-    //     success: function (response, xml) {
-    //         // 此处放成功后执行的代码
-    //         console.log(response);
-    //         json_data = JSON.parse(response)
-    //         play_url = json_data['data'][0]["play_url"]
-    //         // player.pause();
-    //         // console.log(play_url)
-    //         // player.src(play_url); // url 播放地址
-    //         hls.loadSource(play_url);
-    //         hls.on(Hls.Events.MANIFEST_PARSED, function () {
-    //             player.play();
-    //         });
-    //     },
-    //     fail: function (status) {
-    //         // 此处放失败后执行的代码
-    //         console.log(status);
-    //     }
-    // });
 
 }
 
