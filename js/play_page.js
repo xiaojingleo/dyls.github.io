@@ -104,85 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return id;
     }
 
-
     get_detail(global_id);
-    // Initial setup
-    // videoPlayer.addEventListener('loadedmetadata', () => {
-    //     durationDisplay.textContent = formatTime(videoPlayer.duration);
-    // });
-    //
-    // videoPlayer.addEventListener('timeupdate', () => {
-    //     const percentage = (videoPlayer.currentTime / videoPlayer.duration) * 100;
-    //     setVideoProgressCookie(global_id, videoPlayer.currentTime, 7);
-    //     progressBar.value = percentage;
-    //     currentTimeDisplay.textContent = formatTime(videoPlayer.currentTime);
-    // });
-    // // Play/Pause button
-    // playPauseButton.addEventListener('click', () => {
-    //     if (videoPlayer.paused || videoPlayer.ended) {
-    //         videoPlayer.play();
-    //         playPauseButton.textContent = '暂停';
-    //     } else {
-    //         videoPlayer.pause();
-    //         playPauseButton.textContent = '播放';
-    //     }
-    // });
-    // // Progress bar
-    // progressBar.addEventListener('input', () => {
-    //     const percentage = progressBar.value / 100;
-    //     videoPlayer.currentTime = percentage * videoPlayer.duration;
-    // });
-    //
-    // // Fullscreen button
-    // fullscreenButton.addEventListener('click', () => {
-    //     if (!document.fullscreenElement) {
-    //         videoPlayer.requestFullscreen().catch(err => {
-    //             alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
-    //         });
-    //     } else {
-    //         document.exitFullscreen();
-    //     }
-    // });
-    //
-    // // Speed control
-    // speedControl.addEventListener('change', () => {
-    //     videoPlayer.playbackRate = parseFloat(speedControl.value);
-    // });
-
-    // Format time function
-    function formatTime(seconds) {
-        const minutes = Math.floor(seconds / 60);
-        const remainingSeconds = Math.floor(seconds % 60);
-        return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
-    }
-
-    // Auto-hide controls on mouse leave
-    const videoContainer = document.querySelector('.video-container');
-    videoContainer.addEventListener('mouseleave', () => {
-        setTimeout(() => {
-            const controls = document.getElementById('controls');
-            controls.style.opacity = '0';
-        }, 2000); // Delay before hiding controls
-    });
-    videoContainer.addEventListener('mouseenter', () => {
-        const controls = document.getElementById('controls');
-        controls.style.opacity = '1';
-    });
-    // Long press for fast forward (simplified version, not fully implemented)
-    let pressTimer;
-    videoPlayer.addEventListener('mousedown', (e) => {
-        pressTimer = setTimeout(() => {
-            videoPlayer.playbackRate = 4; // Fast forward speed
-        }, 1000); // Delay before considering it a long press
-    });
-    videoPlayer.addEventListener('mouseup', (e) => {
-        clearTimeout(pressTimer);
-        videoPlayer.playbackRate = parseFloat(speedControl.value); // Reset to selected speed
-    });
-    videoPlayer.addEventListener('mouseleave', (e) => {
-        clearTimeout(pressTimer);
-        videoPlayer.playbackRate = parseFloat(speedControl.value); // Reset to selected speed
-    });
     const sourceSelector = document.getElementById('source');
     const episodeSelector = document.getElementById('episode');
 
@@ -292,8 +214,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     episode_option.innerHTML = play_list[i]['list'][j]['episode_name'];
                     videoFiles.push(play_list[i]["list"][j]['play_url']);
                     TCPlayer_Sources.push({src: play_list[i]["list"][j]['play_url'], type: 'videoType/VOD'});
-                    currentIndex = 0;
-                    if (j === 0) {
+                    // currentIndex = 0;
+                    if (j === currentIndex) {
                         episode_option.classList.add('active');
                         // episode_select.value = play_list[i]["list"][j]['play_url'];
                     }
@@ -344,13 +266,21 @@ document.addEventListener('DOMContentLoaded', () => {
                         // 为当前按钮添加active类
                         this.classList.add('active');
                         const data = JSON.parse(handle.target.value);
+
+                        for (let i = 0; i < videoFiles.length; i++) {
+                            if (videoFiles[i] === data.play_url) {
+                                currentIndex = i;
+                                break;
+                            }
+                        }
+
                         play_url_plus(data);
                     });
                     episode_select.append(episode_button)
                     videoFiles.push(datas[i]['play_url']);
                     TCPlayer_Sources.push({src: datas[i]['play_url'], type: 'videoType/VOD'});
-                    currentIndex = 0;
-                    if (i === 0) {
+                    // currentIndex = 0;
+                    if (i === currentIndex) {
                         play_url_plus(datas[i]);
                         episode_button.classList.add('active');
                     }
@@ -415,6 +345,84 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return null; // 如果没有找到cookie，则返回null
     }
+
+    // Initial setup
+    // videoPlayer.addEventListener('loadedmetadata', () => {
+    //     durationDisplay.textContent = formatTime(videoPlayer.duration);
+    // });
+    //
+    // videoPlayer.addEventListener('timeupdate', () => {
+    //     const percentage = (videoPlayer.currentTime / videoPlayer.duration) * 100;
+    //     setVideoProgressCookie(global_id, videoPlayer.currentTime, 7);
+    //     progressBar.value = percentage;
+    //     currentTimeDisplay.textContent = formatTime(videoPlayer.currentTime);
+    // });
+    // // Play/Pause button
+    // playPauseButton.addEventListener('click', () => {
+    //     if (videoPlayer.paused || videoPlayer.ended) {
+    //         videoPlayer.play();
+    //         playPauseButton.textContent = '暂停';
+    //     } else {
+    //         videoPlayer.pause();
+    //         playPauseButton.textContent = '播放';
+    //     }
+    // });
+    // // Progress bar
+    // progressBar.addEventListener('input', () => {
+    //     const percentage = progressBar.value / 100;
+    //     videoPlayer.currentTime = percentage * videoPlayer.duration;
+    // });
+    //
+    // // Fullscreen button
+    // fullscreenButton.addEventListener('click', () => {
+    //     if (!document.fullscreenElement) {
+    //         videoPlayer.requestFullscreen().catch(err => {
+    //             alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+    //         });
+    //     } else {
+    //         document.exitFullscreen();
+    //     }
+    // });
+    //
+    // // Speed control
+    // speedControl.addEventListener('change', () => {
+    //     videoPlayer.playbackRate = parseFloat(speedControl.value);
+    // });
+
+    // Format time function
+    // function formatTime(seconds) {
+    //     const minutes = Math.floor(seconds / 60);
+    //     const remainingSeconds = Math.floor(seconds % 60);
+    //     return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+    // }
+
+    // Auto-hide controls on mouse leave
+    // const videoContainer = document.querySelector('.video-container');
+    // videoContainer.addEventListener('mouseleave', () => {
+    //     setTimeout(() => {
+    //         const controls = document.getElementById('controls');
+    //         controls.style.opacity = '0';
+    //     }, 2000); // Delay before hiding controls
+    // });
+    // videoContainer.addEventListener('mouseenter', () => {
+    //     const controls = document.getElementById('controls');
+    //     controls.style.opacity = '1';
+    // });
+    // Long press for fast forward (simplified version, not fully implemented)
+    // let pressTimer;
+    // videoPlayer.addEventListener('mousedown', (e) => {
+    //     pressTimer = setTimeout(() => {
+    //         videoPlayer.playbackRate = 4; // Fast forward speed
+    //     }, 1000); // Delay before considering it a long press
+    // });
+    // videoPlayer.addEventListener('mouseup', (e) => {
+    //     clearTimeout(pressTimer);
+    //     videoPlayer.playbackRate = parseFloat(speedControl.value); // Reset to selected speed
+    // });
+    // videoPlayer.addEventListener('mouseleave', (e) => {
+    //     clearTimeout(pressTimer);
+    //     videoPlayer.playbackRate = parseFloat(speedControl.value); // Reset to selected speed
+    // });
 
 
 });
