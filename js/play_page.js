@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     videoPlayer.addEventListener('timeupdate', () => {
         const percentage = (videoPlayer.currentTime / videoPlayer.duration) * 100;
+        setVideoProgressCookie(global_id,videoPlayer.currentTime,7);
         progressBar.value = percentage;
         currentTimeDisplay.textContent = formatTime(videoPlayer.currentTime);
     });
@@ -71,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Auto-hide controls on mouse leave
-    const videoContainer = document.querySelector('.container');
+    const videoContainer = document.querySelector('.video-container');
     videoContainer.addEventListener('mouseleave', () => {
         setTimeout(() => {
             const controls = document.getElementById('controls');
@@ -104,18 +105,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const sourceSelector = document.getElementById('source');
     const episodeSelector = document.getElementById('episode');
-
-
-    // 集数选择变化时的事件处理
-    // episodeSelector.addEventListener('click', function () {
-    //     // 获取当前选中的选项的值
-    //     // 这里可以添加更换集数的逻辑，例如更新视频内容等
-    //     const js_data = JSON.parse(episodeSelector.value);
-    //     // console.log('选择的集数:', data);
-    //     document.title = g_title + "-" + js_data.episode_name;
-    //     play_url_plus(js_data);
-    // });
-
 
     function play_url_plus(js_data) {
         const playUrl = js_data.play_url;
@@ -154,21 +143,30 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-// var json_data = {"from_code":"youku","play_url":"","episode_id":"24929681","type":"play","timestamp":get_timestamp()}
-//         // var json_data = {"movie_id": id, "from_code": from_code, "timestamp": get_timestamp()}
-//         var url = 'https://app-v1.ecoliving168.com/api/v1/movie_addr/parse_url'
-//         var par = "";
-//     }
-
 // 播放
     var player = undefined;
     var hls = undefined;
-
+    var intervalid = undefined;
     function play_url(play_url) {
         // let play_url = $("#url").val()
         if (player === undefined) {
             player = document.getElementById('videoPlayer');
+            // player.addEventListener('timeupdate', () => {
+            //     const progress = player.currentTime
+            //     setVideoProgressCookie(global_id, progress, 7);
+            // });
             hls = new Hls();
+            hls.on(Hls.Events.MANIFEST_PARSED, function () {
+                player.play();
+            });
+            hls.on(Hls.Events.MANIFEST_LOADED, function () {
+                if (global_progress>player.currentTime) {
+                    setTimeout(() => {
+                        player.currentTime = global_progress;
+                    },3000);
+                }
+               console.log('manifest loaded');
+            });
         }
         for (let i = 0; i < videoFiles.length; i++) {
             if (videoFiles[i] === play_url) {
@@ -178,9 +176,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         hls.loadSource(play_url);
         hls.attachMedia(player);
-        hls.on(Hls.Events.MANIFEST_PARSED, function () {
-            player.play();
-        });
     }
 
     function get_detail(id) {
@@ -262,8 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
         add_filter_button_event();
         if (episode_select.innerHTML === "") {
             get_play_url_list(movie['id'], play_list[0]['code']);
-        }else
-        {
+        } else {
             play_url_plus({"play_url": videoFiles[currentIndex]});
         }
     }
@@ -351,6 +345,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
+    //播放完成，自动播放下一集
     videoPlayer.addEventListener('ended', function () {
         currentIndex = (currentIndex + 1) % videoFiles.length;
         let data = {"play_url": videoFiles[currentIndex]}
@@ -367,50 +362,29 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // 函数：设置cookie
+    function setVideoProgressCookie(videoId, progress, days) {
+        const cookieName = `videoProgress_${videoId}`;
+        const expires = new Date(Date.now() + days * 864e5).toUTCString();
+        document.cookie = `${cookieName}=${encodeURIComponent(progress)}; expires=${expires}; path=/`;
+    }
+
+    // 函数：获取cookie
+    function getVideoProgressCookie(videoId) {
+        const cookieName = `videoProgress_${videoId}`;
+        const cookies = document.cookie.split('; ');
+        for (let cookie of cookies) {
+            const [name, value] = cookie.split('=');
+            if (decodeURIComponent(name.trim()) === cookieName) {
+                return decodeURIComponent(value.trim());
+            }
+        }
+        return null; // 如果没有找到cookie，则返回null
+    }
+    global_progress = getVideoProgressCookie(global_id);
 
 });
 
-
+let global_progress = 0;
 let videoFiles = [];
 let currentIndex = 0;
-
-async function downloadM3U8() {
-    const m3u8Url = videoFiles[currentIndex];
-
-    try {
-        // Step 1: Fetch M3U8 file content
-        const response = await fetch(m3u8Url);
-        const m3u8Text = await response.text();
-
-        // Step 2: Parse M3U8 file
-        const lines = m3u8Text.split('\n');
-        const baseUri = new URL(m3u8Url).origin;
-        const tsUrls = lines
-            .filter(line => line.endsWith('.ts'))
-            .map(line => new URL(line, baseUri).href);
-
-        // Step 3: Download TS segments
-        const tsBlobs = await Promise.all(tsUrls.map(url => fetchAndBlob(url)));
-
-        // Step 4: Create a Blob for the entire video (this step is simplified)
-        // Normally, you would need to concatenate the TS segments correctly
-        // and possibly convert them to a single MP4 file using a backend service or FFmpeg.js
-        const videoBlob = new Blob(tsBlobs, { type: 'video/mp2t' });
-
-        // Step 5: Create a download link and trigger the download
-        const downloadLink = document.createElement('a');
-        downloadLink.href = URL.createObjectURL(videoBlob);
-        downloadLink.download = 'downloaded_video.ts'; // Change extension if you know the final format
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
-
-    } catch (error) {
-        console.error('Error downloading M3U8:', error);
-    }
-}
-
-async function fetchAndBlob(url) {
-    const response = await fetch(url);
-    return response.blob();
-}

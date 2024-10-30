@@ -98,7 +98,6 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelector('nav ul.nav-list li a.nav-link:first-of-type').classList.add('active');
 
 
-
     const firstPageButton = document.getElementById('firstPage');
     const prevPageButton = document.getElementById('prevPage');
     const nextPageButton = document.getElementById('nextPage');
@@ -299,7 +298,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    function init_movie_list() {
+    function init_movie_list(type_id) {
         let pack = get_pack(JSON.stringify(global_params));
         let signature = get_sign(pack);
         let data = {pack: pack, signature: signature};
@@ -314,7 +313,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 global_total_page = Math.ceil(response.total / response.pageSize);
                 currentPage = response.page;
                 updatePageInfo();
-                add_search_Item(response['list'], config_json.data.index_top_nav[global_type_id].name);
+                add_search_Item(response['list'], config_json.data.index_top_nav[type_id].name);
             },
             fail: function (status) {
                 // 此处放失败后执行的代码
@@ -473,13 +472,13 @@ document.addEventListener('DOMContentLoaded', function () {
             year_container.appendChild(button);
         }
 
-        add_filter_button_event();
+        add_filter_button_event(type_id);
     }
 
-    function add_filter_button_event() {
+    function add_filter_button_event(type_id){
         const filterButtons = document.querySelectorAll('.filter-button');
         global_params['type_id'] = global_type_id;
-        init_movie_list();
+        init_movie_list(type_id);
         filterButtons.forEach(button => {
             if (button.classList.value === "filter-button active") {
                 global_params[button.dataset.filter] = button.dataset.value;
@@ -492,9 +491,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 // 为当前按钮添加active类
                 this.classList.add('active');
                 // 将当前按钮的值存储到全局变量中
+                global_params['type_id'] = global_type_id;
                 global_params[this.dataset.filter] = this.dataset.value;
                 global_params['timestamp'] = get_timestamp();
-                init_movie_list();
+                init_movie_list(type_id);
             });
         });
 
@@ -506,39 +506,21 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    function click_header(type_id) {
-        const container = document.getElementById("containers");
-        container.hidden = true;
-        switch (type_id) {
-            case -1:
-                global_type_id = 0;
-                container.hidden = false;
-                break;
-            case 1:
-            case 2:
-            case 3:
-            case 0:
-                global_type_id = type_id + 1;
-                break;
-            case 4:
-                global_type_id = 36;
-                break;
-        }
-        const filter = document.getElementById('filter-container-id');
-        const pageControler = document.getElementById('pageControler');
-
-        filter.hidden = type_id === -1;
-        pageControler.hidden = type_id === -1;
-
-        init_filter(type_id);
-    }
-
     function addListener() {
         const nav_link = document.querySelectorAll('.nav-link');
         nav_link.forEach(function (item) {
             item.addEventListener('click', function (handle) {
                 const type_id = parseInt(handle.target.dataset.value);
-                click_header(type_id);
+                const container = document.getElementById("containers");
+                container.hidden = true;
+                global_type_id = config_json.data.index_top_nav[type_id].id;
+                const filter = document.getElementById('filter-container-id');
+                const pageControler = document.getElementById('pageControler');
+
+                filter.hidden = type_id === -1;
+                pageControler.hidden = type_id === -1;
+
+                init_filter(type_id);
             });
         });
 
