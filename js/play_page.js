@@ -10,6 +10,93 @@ document.addEventListener('DOMContentLoaded', () => {
     // const global_id = "73xAO";//getUrlParams();
     const global_id = getUrlParams();
     var g_title = "";
+// 播放
+    var player = undefined;
+    var hls = undefined;
+    var intervalid = undefined;
+    let global_progress = getVideoProgressCookie(global_id);
+
+    function play_url(url) {
+
+        if (player === undefined) {
+            player = TCPlayer('player-container-id', {
+                sources: [{
+                    // src: TCPlayer_Sources,
+                    controls: true,
+                    autoplay: true
+                }],
+                // licenseUrl需自己去腾讯云申请
+                licenseUrl: 'https://license.vod2.myqcloud.com/license/v2/1254430396_1/v_cube.license',
+            });
+        }
+        player.src(url); // url 播放地址
+
+        //播放完成，自动播放下一集
+        player.one('ended', function () {
+            console.log('播放结束');
+            if (global_progress === 0)
+                return;
+            global_progress = 0;
+            currentIndex = (currentIndex + 1) % videoFiles.length;
+            let data = {"play_url": videoFiles[currentIndex]}
+
+            play_url_plus(data);
+            const filterButtons = document.querySelectorAll('.filter-button');
+            filterButtons.forEach(button => {
+                if (button.dataset.filter === 'episode') {
+                    if (JSON.parse(button.value).play_url === videoFiles[currentIndex]) {
+                        button.classList.add('active');
+                    } else {
+                        button.classList.remove('active');
+                    }
+                }
+            });
+        });
+        //只触发一次
+        player.one('canplay', function () {
+            console.log('可以播放时');
+            if (global_progress > player.currentTime()) {
+                player.currentTime(global_progress);
+            }
+            player.play();
+        });
+        player.on('timeupdate', function () { // 播放时间更新时触发
+            const progress = player.currentTime();
+            setVideoProgressCookie(global_id, progress, 7);
+        });
+
+    }
+
+    function play_url_old(play_url) {
+        // let play_url = $("#url").val()
+        if (player === undefined) {
+            player = document.getElementById('videoPlayer');
+            // player.addEventListener('timeupdate', () => {
+            //     const progress = player.currentTime
+            //     setVideoProgressCookie(global_id, progress, 7);
+            // });
+            hls = new Hls();
+            hls.on(Hls.Events.MANIFEST_PARSED, function () {
+                player.play();
+            });
+            hls.on(Hls.Events.MANIFEST_LOADED, function () {
+                if (global_progress > player.currentTime) {
+                    setTimeout(() => {
+                        player.currentTime = global_progress;
+                    }, 3000);
+                }
+                console.log('manifest loaded');
+            });
+        }
+        for (let i = 0; i < videoFiles.length; i++) {
+            if (videoFiles[i] === play_url) {
+                currentIndex = i;
+                break;
+            }
+        }
+        hls.loadSource(play_url);
+        hls.attachMedia(player);
+    }
 
     function getUrlParams() {
         const params = new URLSearchParams(window.location.search);
@@ -20,49 +107,47 @@ document.addEventListener('DOMContentLoaded', () => {
 
     get_detail(global_id);
     // Initial setup
-    videoPlayer.addEventListener('loadedmetadata', () => {
-        durationDisplay.textContent = formatTime(videoPlayer.duration);
-    });
-
-    videoPlayer.addEventListener('timeupdate', () => {
-        const percentage = (videoPlayer.currentTime / videoPlayer.duration) * 100;
-        setVideoProgressCookie(global_id,videoPlayer.currentTime,7);
-        progressBar.value = percentage;
-        currentTimeDisplay.textContent = formatTime(videoPlayer.currentTime);
-    });
-
-    // Play/Pause button
-    playPauseButton.addEventListener('click', () => {
-        if (videoPlayer.paused || videoPlayer.ended) {
-            videoPlayer.play();
-            playPauseButton.textContent = '暂停';
-        } else {
-            videoPlayer.pause();
-            playPauseButton.textContent = '播放';
-        }
-    });
-
-    // Progress bar
-    progressBar.addEventListener('input', () => {
-        const percentage = progressBar.value / 100;
-        videoPlayer.currentTime = percentage * videoPlayer.duration;
-    });
-
-    // Fullscreen button
-    fullscreenButton.addEventListener('click', () => {
-        if (!document.fullscreenElement) {
-            videoPlayer.requestFullscreen().catch(err => {
-                alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
-            });
-        } else {
-            document.exitFullscreen();
-        }
-    });
-
-    // Speed control
-    speedControl.addEventListener('change', () => {
-        videoPlayer.playbackRate = parseFloat(speedControl.value);
-    });
+    // videoPlayer.addEventListener('loadedmetadata', () => {
+    //     durationDisplay.textContent = formatTime(videoPlayer.duration);
+    // });
+    //
+    // videoPlayer.addEventListener('timeupdate', () => {
+    //     const percentage = (videoPlayer.currentTime / videoPlayer.duration) * 100;
+    //     setVideoProgressCookie(global_id, videoPlayer.currentTime, 7);
+    //     progressBar.value = percentage;
+    //     currentTimeDisplay.textContent = formatTime(videoPlayer.currentTime);
+    // });
+    // // Play/Pause button
+    // playPauseButton.addEventListener('click', () => {
+    //     if (videoPlayer.paused || videoPlayer.ended) {
+    //         videoPlayer.play();
+    //         playPauseButton.textContent = '暂停';
+    //     } else {
+    //         videoPlayer.pause();
+    //         playPauseButton.textContent = '播放';
+    //     }
+    // });
+    // // Progress bar
+    // progressBar.addEventListener('input', () => {
+    //     const percentage = progressBar.value / 100;
+    //     videoPlayer.currentTime = percentage * videoPlayer.duration;
+    // });
+    //
+    // // Fullscreen button
+    // fullscreenButton.addEventListener('click', () => {
+    //     if (!document.fullscreenElement) {
+    //         videoPlayer.requestFullscreen().catch(err => {
+    //             alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+    //         });
+    //     } else {
+    //         document.exitFullscreen();
+    //     }
+    // });
+    //
+    // // Speed control
+    // speedControl.addEventListener('change', () => {
+    //     videoPlayer.playbackRate = parseFloat(speedControl.value);
+    // });
 
     // Format time function
     function formatTime(seconds) {
@@ -79,12 +164,10 @@ document.addEventListener('DOMContentLoaded', () => {
             controls.style.opacity = '0';
         }, 2000); // Delay before hiding controls
     });
-
     videoContainer.addEventListener('mouseenter', () => {
         const controls = document.getElementById('controls');
         controls.style.opacity = '1';
     });
-
     // Long press for fast forward (simplified version, not fully implemented)
     let pressTimer;
     videoPlayer.addEventListener('mousedown', (e) => {
@@ -92,17 +175,14 @@ document.addEventListener('DOMContentLoaded', () => {
             videoPlayer.playbackRate = 4; // Fast forward speed
         }, 1000); // Delay before considering it a long press
     });
-
     videoPlayer.addEventListener('mouseup', (e) => {
         clearTimeout(pressTimer);
         videoPlayer.playbackRate = parseFloat(speedControl.value); // Reset to selected speed
     });
-
     videoPlayer.addEventListener('mouseleave', (e) => {
         clearTimeout(pressTimer);
         videoPlayer.playbackRate = parseFloat(speedControl.value); // Reset to selected speed
     });
-
     const sourceSelector = document.getElementById('source');
     const episodeSelector = document.getElementById('episode');
 
@@ -143,40 +223,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-// 播放
-    var player = undefined;
-    var hls = undefined;
-    var intervalid = undefined;
-    function play_url(play_url) {
-        // let play_url = $("#url").val()
-        if (player === undefined) {
-            player = document.getElementById('videoPlayer');
-            // player.addEventListener('timeupdate', () => {
-            //     const progress = player.currentTime
-            //     setVideoProgressCookie(global_id, progress, 7);
-            // });
-            hls = new Hls();
-            hls.on(Hls.Events.MANIFEST_PARSED, function () {
-                player.play();
-            });
-            hls.on(Hls.Events.MANIFEST_LOADED, function () {
-                if (global_progress>player.currentTime) {
-                    setTimeout(() => {
-                        player.currentTime = global_progress;
-                    },3000);
-                }
-               console.log('manifest loaded');
-            });
-        }
-        for (let i = 0; i < videoFiles.length; i++) {
-            if (videoFiles[i] === play_url) {
-                currentIndex = i;
-                break;
-            }
-        }
-        hls.loadSource(play_url);
-        hls.attachMedia(player);
-    }
 
     function get_detail(id) {
         const url = "https://app-v1.ecoliving168.com/api/v1/movie/detail"
@@ -237,14 +283,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (play_list[i]['list'].length > 0 && play_list[i]['list'][0]['play_url'].indexOf("m3u8") !== -1) {
                 videoFiles = [];
+                TCPlayer_Sources = [];
                 for (let j = 0; j < play_list[i]['list'].length; j++) {
                     const episode_option = document.createElement('button');
                     episode_option.className = 'filter-button';
                     episode_option.dataset.filter = 'episode';
                     episode_option.dataset.value = JSON.stringify(play_list[i]["list"][j])
                     episode_option.innerHTML = play_list[i]['list'][j]['episode_name'];
-
                     videoFiles.push(play_list[i]["list"][j]['play_url']);
+                    TCPlayer_Sources.push({src: play_list[i]["list"][j]['play_url'], type: 'videoType/VOD'});
                     currentIndex = 0;
                     if (j === 0) {
                         episode_option.classList.add('active');
@@ -284,6 +331,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const episode_select = document.getElementById('episode');
                 episode_select.innerHTML = "";//清空内容
                 videoFiles = [];
+                TCPlayer_Sources = [];
                 for (let i = 0; i < datas.length; i++) {
                     const episode_button = document.createElement('button');
                     episode_button.className = 'filter-button';
@@ -300,6 +348,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                     episode_select.append(episode_button)
                     videoFiles.push(datas[i]['play_url']);
+                    TCPlayer_Sources.push({src: datas[i]['play_url'], type: 'videoType/VOD'});
                     currentIndex = 0;
                     if (i === 0) {
                         play_url_plus(datas[i]);
@@ -315,6 +364,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
+    //添加视频源和集数按钮事件
     function add_filter_button_event() {
         const filterButtons = document.querySelectorAll('.filter-button');
 
@@ -328,6 +378,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 获取当前按钮的data属性
                 const filter = handle.target.dataset.filter;
                 if (filter === 'source') {
+                    global_progress = getVideoProgressCookie(global_id);
                     get_play_url_list(global_id, this.dataset.value);
                 } else if (filter === 'episode') {
                     const data = JSON.parse(this.value);
@@ -344,23 +395,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-
-    //播放完成，自动播放下一集
-    videoPlayer.addEventListener('ended', function () {
-        currentIndex = (currentIndex + 1) % videoFiles.length;
-        let data = {"play_url": videoFiles[currentIndex]}
-        play_url_plus(data);
-        const filterButtons = document.querySelectorAll('.filter-button');
-        filterButtons.forEach(button => {
-            if (button.dataset.filter === 'episode') {
-                if (JSON.parse(button.value).play_url === videoFiles[currentIndex]) {
-                    button.classList.add('active');
-                } else {
-                    button.classList.remove('active');
-                }
-            }
-        });
-    });
 
     // 函数：设置cookie
     function setVideoProgressCookie(videoId, progress, days) {
@@ -381,10 +415,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return null; // 如果没有找到cookie，则返回null
     }
-    global_progress = getVideoProgressCookie(global_id);
+
 
 });
 
 let global_progress = 0;
 let videoFiles = [];
+let TCPlayer_Sources = [];
 let currentIndex = 0;

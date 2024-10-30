@@ -12,6 +12,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/2.3.1/jsencrypt.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.0.0-beta.1/jsencrypt.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+
+
+    <link rel="stylesheet" href="https://cdn.staticfile.org/social-share.js/1.0.16/css/share.min.css">
+    <script src="https://cdn.staticfile.org/social-share.js/1.0.16/js/social-share.min.js"></script>
+
+    <link href="tcplayer/tcplayer.min.css" rel="stylesheet"/>
+    <!--如果需要在 Chrome 和 Firefox 等现代浏览器中通过 H5 播放 HLS 格式的视频，需要在 tcplayer.vx.x.x.min.js 之前引入 hls.min.x.xx.m.js。-->
+    <script src="tcplayer/libs/hls.min.1.1.7.js"></script>
+
+    <script src="tcplayer/tcplayer.v5.1.0.min.js"></script>
     <script src="./js/common.js"></script>
 </head>
 <body>
@@ -19,21 +29,24 @@
 <div class="container">
     <!-- 视频播放器 -->
     <div class="video-container">
-        <video id="videoPlayer" controls></video>
-        <div class="controls" id="controls">
-            <button id="playPause">暂停</button>
-            <input type="range" id="progressBar" value="0" min="0" max="100">
-            <span id="currentTime">0:00</span> / <span id="duration">0:00</span>
-            <button id="fullscreen">全屏</button>
-            <select id="speedControl">
-                <option value="0.5">0.5x</option>
-                <option value="1" selected>1x</option>
-                <option value="1.5">1.5x</option>
-                <option value="2">2x</option>
-            </select>
-        </div>
+        <video id="player-container-id" preload="auto" playsinline webkit-playsinline
+               style="width: 100%;min-height:600px; background:#000;">
+        </video>
+        <!--        <video id="videoPlayer" controls></video>-->
+        <!--        <div class="controls" id="controls" hidden="hidden">-->
+        <!--            <button id="playPause">暂停</button>-->
+        <!--            <input type="range" id="progressBar" value="0" min="0" max="100">-->
+        <!--            <span id="currentTime">0:00</span> / <span id="duration">0:00</span>-->
+        <!--            <button id="fullscreen">全屏</button>-->
+        <!--            <select id="speedControl">-->
+        <!--                <option value="0.5">0.5x</option>-->
+        <!--                <option value="1" selected>1x</option>-->
+        <!--                <option value="1.5">1.5x</option>-->
+        <!--                <option value="2">2x</option>-->
+        <!--            </select>-->
+        <!--        </div>-->
     </div>
-
+    <P2>---影片介绍---</P2>
     <!-- 视频详情区域 -->
     <div class="video-details">
         <!-- 视频海报图片 -->
