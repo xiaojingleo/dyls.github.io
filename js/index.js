@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let currentPage = 1;
     let global_total_page = 10;
     let global_type_id = 0;
+    let global_type_index = 0;
     let global_params = {
         "type_id": "1",
         "sort": "by_default",
@@ -41,34 +42,36 @@ document.addEventListener('DOMContentLoaded', function () {
     button4.innerHTML = "评分";
     zonghe_container.appendChild(button4);
 
-    const par = {"timestamp": get_timestamp()};
-    const pack = get_pack(JSON.stringify(par));
-    const signature = get_sign(pack);
-    const data = {pack: pack, signature: signature};
-    ajax(
-        {
-            url: "https://app-v1.ecoliving168.com/api/v1/movie/index_recommend",
-            type: "GET",
-            data: data,
-            dataType: "json",
-            success: function (response, xml) {
-                respose = JSON.parse(response)
-                datas = respose['data'];
-                datas.forEach(function (data) {
-                    if (data.title === 'carousel')
-                        var a = 1;
-                    else if (data.layout === 'base') {
-                        addItem(data, 'containers');
-                    }
-                });
-            },
-            fail: function (status) {
-                console.log(status);
-                return status;
+    function init_firstPage() {
+        const par = {"timestamp": get_timestamp()};
+        const pack = get_pack(JSON.stringify(par));
+        const signature = get_sign(pack);
+        const data = {pack: pack, signature: signature};
+        ajax(
+            {
+                url: "https://app-v1.ecoliving168.com/api/v1/movie/index_recommend",
+                type: "GET",
+                data: data,
+                dataType: "json",
+                success: function (response, xml) {
+                    respose = JSON.parse(response)
+                    datas = respose['data'];
+                    datas.forEach(function (data) {
+                        if (data.title === 'carousel')
+                            var a = 1;
+                        else if (data.layout === 'base') {
+                            addItem(data, 'containers');
+                        }
+                    });
+                },
+                fail: function (status) {
+                    console.log(status);
+                    return status;
+                }
             }
-        }
-    );
-
+        );
+    }
+    init_firstPage();
 
 // 导航栏点击事件处理
     const navLinks = document.querySelectorAll('nav ul.nav-list li a.nav-link');
@@ -148,10 +151,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // 初始化
     // updatePageInfo();
-    updateContent();
+    // updateContent();
 
     function addItem(items, containerid) {
         // 获取容器元素
+        const containerresult = document.getElementById("search-result");
+        containerresult.innerHTML = '';// 清空容器内容
         const container = document.getElementById(containerid);
         containers.hidden = false;
         const h3_container = document.createElement('h3');
@@ -203,7 +208,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 // 执行其他操作...
             });
         }
-
     }
 
     function add_search_Item(items, name) {
@@ -298,7 +302,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    function init_movie_list(type_id) {
+    function init_movie_list() {
         let pack = get_pack(JSON.stringify(global_params));
         let signature = get_sign(pack);
         let data = {pack: pack, signature: signature};
@@ -313,7 +317,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 global_total_page = Math.ceil(response.total / response.pageSize);
                 currentPage = response.page;
                 updatePageInfo();
-                add_search_Item(response['list'], config_json.data.index_top_nav[type_id].name);
+                add_search_Item(response['list'], config_json.data.index_top_nav[global_type_index].name);
             },
             fail: function (status) {
                 // 此处放失败后执行的代码
@@ -429,14 +433,14 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // 0:电影，1：剧集，2：综艺，3：动漫，4：爽剧，5：福利
-    function init_filter(type_id) {
+    function init_filter() {
         const leixing_container = document.getElementById('leixing_id');
         const diqu_container = document.getElementById('diqu_id');
         const year_container = document.getElementById('year_id');
         leixing_container.innerHTML = '';
         diqu_container.innerHTML = '';
         year_container.innerHTML = '';
-        let leixing_data = config_json.data.movie_screen['filter'][type_id];
+        let leixing_data = config_json.data.movie_screen['filter'][global_type_index];
         for (let i = 0; i < leixing_data.class.length; i++) {
             const button = document.createElement('button');
             button.className = 'filter-button';
@@ -472,13 +476,13 @@ document.addEventListener('DOMContentLoaded', function () {
             year_container.appendChild(button);
         }
 
-        add_filter_button_event(type_id);
+        add_filter_button_event();
     }
 
-    function add_filter_button_event(type_id){
+    function add_filter_button_event() {
         const filterButtons = document.querySelectorAll('.filter-button');
         global_params['type_id'] = global_type_id;
-        init_movie_list(type_id);
+        init_movie_list();
         filterButtons.forEach(button => {
             if (button.classList.value === "filter-button active") {
                 global_params[button.dataset.filter] = button.dataset.value;
@@ -494,7 +498,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 global_params['type_id'] = global_type_id;
                 global_params[this.dataset.filter] = this.dataset.value;
                 global_params['timestamp'] = get_timestamp();
-                init_movie_list(type_id);
+                init_movie_list();
             });
         });
 
@@ -510,21 +514,23 @@ document.addEventListener('DOMContentLoaded', function () {
         const nav_link = document.querySelectorAll('.nav-link');
         nav_link.forEach(function (item) {
             item.addEventListener('click', function (handle) {
-                const type_id = parseInt(handle.target.dataset.value);
+                global_type_index = parseInt(handle.target.dataset.value);
+
                 const container = document.getElementById("containers");
                 container.hidden = true;
-                global_type_id = config_json.data.index_top_nav[type_id].id;
+                global_type_id = config_json.data.index_top_nav[global_type_index].id;
                 const filter = document.getElementById('filter-container-id');
                 const pageControler = document.getElementById('pageControler');
 
-                filter.hidden = type_id === -1;
-                pageControler.hidden = type_id === -1;
-
-                init_filter(type_id);
+                filter.hidden = !global_type_index;
+                pageControler.hidden = !global_type_index;
+                if (!global_type_index) {
+                    init_firstPage();
+                } else {
+                    init_filter();
+                }
             });
         });
-
-
     }
 
     addListener();
