@@ -213,6 +213,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function add_search_Item(items, name) {
         // 获取容器元素
         const container = document.getElementById("search-result");
+
         container.innerHTML = '';// 清空容器内容
         const h3_container = document.createElement('h3');
         h3_container.textContent = name;
@@ -534,5 +535,14 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     addListener();
+
+    // 滚动事件监听器
+    window.addEventListener('scroll', () => {
+        let bottomOfWindow = Math.ceil(window.scrollY + window.innerHeight) >= document.documentElement.scrollHeight;
+        if (bottomOfWindow && currentPage<global_total_page) {
+                currentPage++;
+                init_movie_list();
+        }
+    });
 });
 

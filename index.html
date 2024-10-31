@@ -4,14 +4,14 @@
     <style>
         .main {
             padding: 16px 16px;
-            width: 60%;
-            max-width: 80%;
+            width: 100%;
+            max-width: 100%;
             margin: 0 auto;
         }
 
 
         .main .form {
-            width: 100%;
+            width: 90%;
             display: flex;
             flex-direction: row;
             margin-bottom: 24px;
@@ -76,7 +76,7 @@
         }
 
         .search-box {
-            flex: 1; /* 输入框占据剩余空间 */
+            flex: 6; /* 输入框占据剩余空间 */
             padding: 10px;
             font-size: 16px;
             border: 1px solid #ccc;
@@ -84,6 +84,7 @@
         }
 
         .search-button {
+            flex: 1;
             padding: 10px 20px;
             font-size: 16px;
             color: white;
@@ -97,26 +98,7 @@
             background-color: #0056b3;
         }
 
-        .suggestions {
-            display: none;
-            position: absolute;
-            top: 100%; /* 紧贴输入框下方 */
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            background-color: white;
-            border: 1px solid #ccc;
-            border-top: none;
-            border-radius: 0 0 4px 4px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            max-height: 200px; /* 限制高度以防内容过多 */
-            overflow-y: auto; /* 允许垂直滚动 */
-        }
 
-        .suggestion {
-            padding: 10px;
-            cursor: pointer;
-        }
 
 
     </style>
@@ -135,7 +117,7 @@
 </head>
 <body>
 <header>
-    <h1>电影视频网站</h1>
+<!--    <h1>电影视频网站</h1>-->
     <nav>
         <ul class="nav-list">
             <li><a href="#" class="nav-link" data-value="0" >首页</a></li>
