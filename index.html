@@ -97,11 +97,8 @@
         .search-button:hover {
             background-color: #0056b3;
         }
-
-
-
-
     </style>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>电影视频网站</title>
@@ -116,6 +113,12 @@
 
 </head>
 <body>
+<script src="//sdk.51.la/js-sdk-integrate.min.js" crossorigin="anonymous" charset="UTF-8"></script>
+<div id="LA_INTEGRATE_BOX"></div>
+<script>
+const la_integrate = new LAIntegrate({ /* your options in here... */ })
+la_integrate.start();
+</script>
 <header>
 <!--    <h1>电影视频网站</h1>-->
     <nav>
